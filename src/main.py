@@ -88,9 +88,12 @@ class Main:
 
                         # vaild move ?
                         if board.vaild_move(dragger.piece, move):
+                            # normal capture
                             captured = board.squares[released_row][released_col].has_piece()
-
                             board.move(dragger.piece, move)
+
+                            board.set_true_en_passant(dragger.piece)
+
                             # sounds
                             game.play_sound(captured)
                             # show methods
