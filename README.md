@@ -1,7 +1,7 @@
 # Chess Game
 made with python
 
-## instructions
+## Instructions
 - Entry point: main.py
 - Drag mouse to controll pieces
 - Press 't' to change theme
