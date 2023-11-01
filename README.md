@@ -10,17 +10,18 @@ made with python
 - working on AI mode
 - only supports PVP currently
 
+-----------------
 
 ### TODO:
 
-features
-- some VFX for pawn promotion
-- winner result screen
+- features
+    - some VFX for pawn promotion
+    - winner result screen
 
-fix bug
-- some pieces can capture same team
-- when pawn en-passant capture sound and move sounds plays simultaneously
-- king cant move to the grid which it can go
+- fix bug
+    - some pieces can capture same team
+    - when pawn en-passant capture sound and move sounds plays simultaneously
+    - king cant move to the grid which it can go
 
-implementation
-- chess AI
+- implementation
+    - chess AI
