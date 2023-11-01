@@ -1,13 +1,24 @@
-# chess
+# Chess Game
+made with python
 
-TODO:
+## instructions
+- Entry point: main.py
+- Drag mouse to controll pieces
+- Press 't' to change theme
+- Press 'r' to reset game
+
+- working on AI mode
+- only supports PVP currently
+
+
+### TODO:
 
 features
 - some VFX for pawn promotion
 - winner result screen
 
 fix bug
-- when king can capture same team when the piece captured checked piece - solved... maybe?
+- some pieces can capture same team
 - when pawn en-passant capture sound and move sounds plays simultaneously
 - king cant move to the grid which it can go
 
