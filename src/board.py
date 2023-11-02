@@ -91,6 +91,9 @@ class Board:
                     p = temp_board.squares[row][col].piece
                     temp_board.calc_moves(p, row, col, bool=False)
                     for m in p.moves:
+                        if m.final.has_piece():
+                            print(f'{p.color} {p.name} at {row}, {col} Can capture {m.final.piece.color} {m.final.piece.name} at {m.final.row} {m.final.col}')
+
                         if isinstance(m.final.piece, King):
                             return True
         
@@ -196,7 +199,6 @@ class Board:
                             else:
                                 # append new move
                                 piece.add_move(move)
-
 
         def knight_moves():
             # 8 possible moves
@@ -427,6 +429,12 @@ class Board:
             
         elif isinstance(piece, King):
             king_moves()
+
+        if bool==True:
+            print(f'{piece.color} {piece.name} at {row}, {col} can move to:', end="\n| ")
+            for move in piece.moves:
+                print(f'{move.final.row}, {move.final.col}', end=" | ")
+            print('')
 
     def _create(self):
         for row in range(ROWS):
