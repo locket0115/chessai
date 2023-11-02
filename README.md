@@ -7,21 +7,16 @@ made with python
 - Press 't' to change theme
 - Press 'r' to reset game
 
-- working on AI mode
-- only supports PVP currently
-
 -----------------
 
 ### TODO:
 
-- features
-    - some VFX for pawn promotion
-    - winner result screen
-
-- fix bug
+- Bug fix
     - some pieces can capture same team
     - when pawn en-passant capture sound and move sounds plays simultaneously
     - king cant move to the grid which it can go
 
-- implementation
+- Features
+    - some VFX for pawn promotion
+    - winner result screen
     - chess AI
