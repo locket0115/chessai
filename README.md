@@ -13,6 +13,7 @@ made with python
 
 - Bug fix
     - when pawn en-passant capture sound and move sounds plays simultaneously
+    - King can move to grid which it cant go
 
 - Features
     - some VFX for pawn promotion
