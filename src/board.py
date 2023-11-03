@@ -95,7 +95,10 @@ class Board:
                             print(f'{p.color} {p.name} at {row}, {col} Can capture {m.final.piece.color} {m.final.piece.name} at {m.final.row} {m.final.col}')
 
                         if isinstance(m.final.piece, King):
+                            p.clear_moves()
                             return True
+                        
+                    p.clear_moves()
         
         return False
 
@@ -230,7 +233,7 @@ class Board:
                             if not self.in_check(piece, move):
                                 # append new move
                                 piece.add_move(move)
-                            else: break
+                            # else: break
                         else:
                             # append new move
                             piece.add_move(move)
@@ -314,7 +317,7 @@ class Board:
                             if not self.in_check(piece, move):
                                 # append new move
                                 piece.add_move(move)
-                            else: break
+                            # else: break
                         else:
                             # append new move
                             piece.add_move(move)

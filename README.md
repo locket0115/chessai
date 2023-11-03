@@ -12,9 +12,7 @@ made with python
 ### TODO:
 
 - Bug fix
-    - some pieces can capture same team
     - when pawn en-passant capture sound and move sounds plays simultaneously
-    - king cant move to the grid which it can go
 
 - Features
     - some VFX for pawn promotion
