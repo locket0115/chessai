@@ -33,10 +33,6 @@ class Board:
                 # console board move update
                 self.squares[initial.row][initial.col + diff].piece = None
                 self.squares[final.row][final.col].piece = piece
-                if not testing:
-                    sound = Sound(
-                        os.path.join('assets/sounds/capture.wav'))
-                    sound.play()
 
             # pawn promotion
             else:
@@ -91,6 +87,9 @@ class Board:
                     p = temp_board.squares[row][col].piece
                     temp_board.calc_moves(p, row, col, bool=False)
                     for m in p.moves:
+                        
+                        if isinstance(p, King):
+                            print(f'{p.color} king can move to {m.final.row},{m.final.col}')
                         if m.final.has_piece():
                             print(f'{p.color} {p.name} at {row}, {col} Can capture {m.final.piece.color} {m.final.piece.name} at {m.final.row} {m.final.col}')
 
@@ -233,7 +232,6 @@ class Board:
                             if not self.in_check(piece, move):
                                 # append new move
                                 piece.add_move(move)
-                            # else: break
                         else:
                             # append new move
                             piece.add_move(move)
@@ -317,7 +315,6 @@ class Board:
                             if not self.in_check(piece, move):
                                 # append new move
                                 piece.add_move(move)
-                            # else: break
                         else:
                             # append new move
                             piece.add_move(move)
@@ -433,11 +430,12 @@ class Board:
         elif isinstance(piece, King):
             king_moves()
 
-        if bool==True:
-            print(f'{piece.color} {piece.name} at {row}, {col} can move to:', end="\n| ")
-            for move in piece.moves:
-                print(f'{move.final.row}, {move.final.col}', end=" | ")
-            print('')
+        # debug code
+        # if bool==True:
+        #     print(f'{piece.color} {piece.name} at {row}, {col} can move to:', end="\n| ")
+        #     for move in piece.moves:
+        #         print(f'{move.final.row}, {move.final.col}', end=" | ")
+        #     print('')
 
     def _create(self):
         for row in range(ROWS):
@@ -450,7 +448,6 @@ class Board:
         # pawns
         for col in range(COLS):
             self.squares[row_pawn][col] = Square(row_pawn, col, Pawn(color))
-
 
         # knights
         self.squares[row_other][1] = Square(row_other, 1, Knight(color))

@@ -5,6 +5,7 @@ from const import *
 from game import Game
 from square import Square
 from move import Move
+from piece import *
 
 class Main:
 
@@ -94,12 +95,13 @@ class Main:
                             if board.vaild_move(dragger.piece, move):
                                 # normal capture
                                 captured = board.squares[released_row][released_col].has_piece()
+                                en_passanted = isinstance(dragger.piece, Pawn) and (initial.col != released_col)
                                 board.move(dragger.piece, move)
 
                                 board.set_true_en_passant(dragger.piece)
 
                                 # sounds
-                                game.play_sound(captured)
+                                game.play_sound(captured or en_passanted)
                                 # show methods
                                 game.show_bg(screen)
                                 game.show_last_move(screen)
@@ -107,6 +109,7 @@ class Main:
                                 # next turn
                                 game.next_turn()
 
+                        # clear moves
                         dragger.piece.clear_moves()
 
                     dragger.undrag_piece()
