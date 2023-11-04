@@ -12,7 +12,7 @@ made with python
 ### TODO:
 
 - Bug fix
-    - King can move to grid which it cant go
+    - King can move to grid which opponent king adjacented
 
 - Features
     - some VFX for pawn promotion
