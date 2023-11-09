@@ -11,9 +11,6 @@ made with python
 
 ### TODO:
 
-- Bug fix
-    - King can move to grid which opponent king adjacented
-
 - Features
     - some VFX for pawn promotion
     - winner result screen

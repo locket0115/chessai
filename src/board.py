@@ -87,18 +87,11 @@ class Board:
                     p = temp_board.squares[row][col].piece
                     temp_board.calc_moves(p, row, col, bool=False)
                     for m in p.moves:
-                        
-                        if isinstance(p, King):
-                            print(f'{p.color} king can move to {m.final.row},{m.final.col}')
-                        if m.final.has_piece():
-                            print(f'{p.color} {p.name} at {row}, {col} Can capture {m.final.piece.color} {m.final.piece.name} at {m.final.row} {m.final.col}')
-
                         if isinstance(m.final.piece, King):
                             p.clear_moves()
                             return True
                         
                     p.clear_moves()
-        
         return False
 
     def calc_moves(self, piece, row, col, bool=True):
@@ -306,7 +299,8 @@ class Board:
                     if self.squares[possible_move_row][possible_move_col].isempty_or_enemy(piece.color):
                         # create squares of the new move
                         initial = Square(row, col)
-                        final = Square(possible_move_row, possible_move_col) # piece = piece
+                        final_piece = self.squares[possible_move_row][possible_move_col].piece
+                        final = Square(possible_move_row, possible_move_col, final_piece)
                         # create new move
                         move = Move(initial, final)
                         
