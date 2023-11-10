@@ -6,3 +6,6 @@ HEIGHT = 800
 ROWS = 8
 COLS = 8
 SQSIZE = WIDTH // COLS
+
+#Number dimensions
+INF = 1234567890
