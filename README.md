@@ -11,12 +11,10 @@ made with python
 
 ### TODO:
 
+- Fix bug
+    - cant detect check while castling
+
 - Features
     - some VFX for pawn promotion
     - winner result screen
-
-- chess AI
-    - evaluation
-    - minimax
-    - alphabeta
-    - get move
+    - add AI gamemode
