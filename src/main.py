@@ -6,6 +6,7 @@ from game import Game
 from square import Square
 from move import Move
 from piece import *
+from ai import AI
 
 class Main:
 

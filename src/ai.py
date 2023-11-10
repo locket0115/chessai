@@ -119,7 +119,7 @@ class AI:
             temp_board = copy.deepcopy(board)
             temp_board.move(piece, move)
 
-            score = AI.alphabeta(temp_board, 2, -INFINITE, INFINITE, True)
+            score = AI.alphabeta(temp_board, 4, -INFINITE, INFINITE, True)
 
             if score > best_score:
                 best_score = score
@@ -136,7 +136,7 @@ class AI:
             best_score = -INFINITE
             for move in board.get_possible_moves('white'):
                 temp_board = copy.deepcopy(board)
-                temp_board.move()
+                temp_board.move(move.initial.piece, move)
 
                 best_score = max(best_score, AI.alphabeta(copy, depth-1, a, b, False))
                 a = max(a, best_score)
@@ -147,7 +147,7 @@ class AI:
             best_score = INFINITE
             for move in board.get_possible_moves('black'):
                 temp_board = copy.deepcopy(board)
-                temp_board.move()
+                temp_board.move(move.initial.piece, move)
 
                 best_score = min(best_score, AI.alphabeta(copy, depth-1, a, b, True))
                 a = min(a, best_score)
