@@ -76,22 +76,30 @@ class Board:
 
         piece.en_passant = True
 
+    def get_possible_moves(self, color):
+        moves = []
+
+        for row in range(ROWS):
+            for col in range(COLS):
+                if self.squares[row][col].has_team_piece(color):
+                    piece = self.squares[row][col].piece
+                    self.calc_moves(piece, row, col, bool=False)
+                    moves += piece.moves
+                    piece.clear_moves()
+        
+        return moves
+
     def in_check(self, piece, move):
         temp_piece = copy.deepcopy(piece)
         temp_board = copy.deepcopy(self)
         temp_board.move(temp_piece, move, testing=True)
 
-        for row in range(ROWS):
-            for col in range(COLS):
-                if temp_board.squares[row][col].has_enemy_piece(piece.color):
-                    p = temp_board.squares[row][col].piece
-                    temp_board.calc_moves(p, row, col, bool=False)
-                    for m in p.moves:
-                        if isinstance(m.final.piece, King):
-                            p.clear_moves()
-                            return True
-                        
-                    p.clear_moves()
+        possible_moves = temp_board.get_possible_moves('white' if temp_piece.color == 'black' else 'black')
+
+        for m in possible_moves:
+            if isinstance(m.final.piece, King):
+                return True
+            
         return False
 
     def calc_moves(self, piece, row, col, bool=True):
