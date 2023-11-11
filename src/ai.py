@@ -130,7 +130,6 @@ class AI:
     @staticmethod
     def alphabeta(board, depth, a, b, maximizing):
         if depth == 0:
-            print('', end='1')
             return Heuristics.evaluate(board)
         
         if maximizing:
