@@ -14,4 +14,3 @@ made with python
 - Features
     - some VFX for pawn promotion
     - winner result screen
-    - chess AI
