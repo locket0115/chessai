@@ -17,6 +17,10 @@ class Config:
         self.capture_sound = Sound(
             os.path.join('assets/sounds/capture.wav'))
 
+    def set_theme(self, theme):
+        self.idx = theme % len(self.themes)
+        self.theme = self.themes[self.idx]
+
     def change_theme(self):
         self.idx += 1
         self.idx %= len(self.themes) # [t1, t2, t3, t4]

@@ -48,7 +48,7 @@ class Main:
                         if board.squares[clicked_row][clicked_col].has_piece():
                             piece = board.squares[clicked_row][clicked_col].piece
                             # vaild piece (color) ?
-                            if piece.color == game.next_player:
+                            if piece.color == game.next_player and game.next_player == 'white':
                                 board.calc_moves(piece, clicked_row, clicked_col, bool=True)
                                 dragger.save_initial(event.pos)
                                 dragger.drag_piece(piece)
@@ -134,8 +134,11 @@ class Main:
                     pygame.quit()
                     sys.exit()
 
-
-
+            if game.next_player == 'black':
+                move = AI.get_best_move(board)
+                p = board.squares[move.initial.row][move.initial.col].piece
+                board.move(p, move)
+                game.next_turn()
             
             pygame.display.update()
 

@@ -120,4 +120,6 @@ class Game:
             self.config.move_sound.play()
 
     def reset(self):
+        idx = self.config.idx
         self.__init__()
+        self.config.set_theme(idx)

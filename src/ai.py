@@ -88,7 +88,7 @@ class Heuristics:
                         if piece.color == 'white':
                             sum += table[row][col]
                         else:
-                            sum -= table[ROWS-row][col]
+                            sum -= table[ROWS-1-row][col]
 
         return sum
 
@@ -99,7 +99,7 @@ class Heuristics:
             for col in range(COLS):
                 if board.squares[row][col].has_piece():
                     piece = board.squares[row][col].piece
-                    sum += piece.value * piece.value_sign
+                    sum += piece.value
 
         return sum
         
@@ -107,19 +107,19 @@ class Heuristics:
 class AI:
 
     @staticmethod
-    def get_move(board):
+    def get_best_move(board):
         best_move = None
         best_score = INFINITE
 
         for move in board.get_possible_moves('black'):
-            piece = move.initial.piece
-            if board.in_check(piece, move):
+            temp_board = copy.deepcopy(board)
+            piece = temp_board.squares[move.initial.row][move.initial.col].piece
+            if temp_board.in_check(piece, move):
                 continue
 
-            temp_board = copy.deepcopy(board)
             temp_board.move(piece, move)
 
-            score = AI.alphabeta(temp_board, 4, -INFINITE, INFINITE, True)
+            score = AI.alphabeta(temp_board, 2, -INFINITE, INFINITE, True)
 
             if score > best_score:
                 best_score = score
@@ -130,15 +130,16 @@ class AI:
     @staticmethod
     def alphabeta(board, depth, a, b, maximizing):
         if depth == 0:
+            print('', end='1')
             return Heuristics.evaluate(board)
         
         if maximizing:
             best_score = -INFINITE
             for move in board.get_possible_moves('white'):
                 temp_board = copy.deepcopy(board)
-                temp_board.move(move.initial.piece, move)
+                temp_board.move(temp_board.squares[move.initial.row][move.initial.col].piece, move)
 
-                best_score = max(best_score, AI.alphabeta(copy, depth-1, a, b, False))
+                best_score = max(best_score, AI.alphabeta(temp_board, depth-1, a, b, False))
                 a = max(a, best_score)
                 if b <= a:
                     break
@@ -147,9 +148,9 @@ class AI:
             best_score = INFINITE
             for move in board.get_possible_moves('black'):
                 temp_board = copy.deepcopy(board)
-                temp_board.move(move.initial.piece, move)
+                temp_board.move(temp_board.squares[move.initial.row][move.initial.col].piece, move)
 
-                best_score = min(best_score, AI.alphabeta(copy, depth-1, a, b, True))
+                best_score = min(best_score, AI.alphabeta(temp_board, depth-1, a, b, True))
                 a = min(a, best_score)
                 if b <= a:
                     break
