@@ -17,4 +17,6 @@ made with python
 - Features
     - some VFX for pawn promotion
     - winner result screen
-    - add AI gamemode
+
+- Other
+    - optimize AI performence

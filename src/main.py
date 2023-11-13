@@ -22,6 +22,7 @@ class Main:
         game = self.game
         board = self.game.board
         dragger = self.game.dragger
+        t = 0
 
         while True:
             # show methods
@@ -29,10 +30,15 @@ class Main:
             game.show_last_move(screen)
             game.show_moves(screen)
             game.show_pieces(screen)
-            game.show_hover(screen)
+            # game.show_hover(screen)
 
             if dragger.dragging:
                 dragger.update_blit(screen)
+                
+            if game.next_player == 'black' and t > 2:
+                p, move = AI.get_best_move(board, 'black')
+                board.move(p, move)
+                game.next_turn()
 
             for event in pygame.event.get():
 
@@ -74,7 +80,7 @@ class Main:
                             game.show_last_move(screen)
                             game.show_moves(screen)
                             game.show_pieces(screen)
-                            game.show_hover(screen)
+                            # game.show_hover(screen)
                             dragger.update_blit(screen)
 
                 #click release
@@ -112,6 +118,7 @@ class Main:
 
                         # clear moves
                         dragger.piece.clear_moves()
+                        t = 0
 
                     dragger.undrag_piece()
 
@@ -134,12 +141,7 @@ class Main:
                     pygame.quit()
                     sys.exit()
 
-            if game.next_player == 'black':
-                move = AI.get_best_move(board)
-                p = board.squares[move.initial.row][move.initial.col].piece
-                board.move(p, move)
-                game.next_turn()
-            
+            t = t+1
             pygame.display.update()
 
 
