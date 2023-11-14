@@ -42,8 +42,20 @@ class Board:
         if isinstance(piece, King):
             if self.castling(initial, final) and not testing:
                 diff = final.col - initial.col
-                rook = piece.left_rook if (diff < 0) else piece.right_rook
-                self.move(rook, rook.moves[-1])
+                row = initial.row
+
+                if diff < 0:
+                    initial = Square(row, 0)
+                    final = Square(row, 3)
+                    moveR = Move(initial, final)
+
+                    self.move(piece.left_rook, moveR)
+                else:
+                    initial = Square(row, 7)
+                    final = Square(row, 5)
+                    moveR = Move(initial, final)
+
+                    self.move(piece.right_rook, moveR)
 
         #move
         piece.moved = True
@@ -90,11 +102,11 @@ class Board:
 
         return moves
 
-
     def in_check(self, piece, move):
-        temp_piece = copy.deepcopy(piece)
         temp_board = copy.deepcopy(self)
-        temp_board.move(temp_piece, move, testing=True)
+        if move != None:
+            temp_piece = copy.deepcopy(piece)
+            temp_board.move(temp_piece, move, testing=True)
 
         for row in range(ROWS):
             for col in range(COLS):
@@ -102,7 +114,7 @@ class Board:
                     p = temp_board.squares[row][col].piece
                     temp_board.calc_moves(p, row, col, bool=False)
                     for m in p.moves:
-                        if isinstance(m.final.piece, King):
+                        if isinstance(m.final.piece, King) and m.final.piece.color == piece.color:
                             p.clear_moves()
                             return True
                     p.clear_moves()
@@ -111,7 +123,7 @@ class Board:
 
     def calc_moves(self, piece, row, col, bool=True):
         '''
-            Calculate all the possible (valid) moves of an specific piece on a specific position
+            Calculate all the possible (valid) moves of an specific piece on a specific position  
         '''
         
         def pawn_moves():
@@ -348,21 +360,17 @@ class Board:
                                 final = Square(row, 3)
                                 moveR = Move(initial, final)
 
-                                #king 
+                                # king 
                                 initial = Square(row, col)
                                 final = Square(row, 2)
                                 moveK = Move(initial, final)
 
                                 # check potencial checks
                                 if bool:
-                                    if not self.in_check(piece, move) and not self.in_check(left_rook, moveR):
-                                        # append new move to rook
-                                        left_rook.add_move(moveR)
+                                    if not self.in_check(piece, moveK) and not self.in_check(left_rook, moveR):
                                         # append new move to king
                                         piece.add_move(moveK)
                                 else:
-                                    # append new move to rook
-                                    left_rook.add_move(moveR)
                                     # append new move to king
                                     piece.add_move(moveK)
             
@@ -376,7 +384,7 @@ class Board:
                                 break
 
                             if c == 6:
-                                # adds left rook to king
+                                # adds right rook to king
                                 piece.right_rook = right_rook
 
                                 # rook move
@@ -384,21 +392,17 @@ class Board:
                                 final = Square(row, 5)
                                 moveR = Move(initial, final)
 
-                                #king 
+                                # king 
                                 initial = Square(row, col)
                                 final = Square(row, 6)
                                 moveK = Move(initial, final)
 
                                 # check potencial checks
                                 if bool:
-                                    if not self.in_check(piece, move) and not self.in_check(right_rook, moveR):
-                                        # append new move to rook
-                                        right_rook.add_move(moveR)
+                                    if not self.in_check(piece, moveK) and not self.in_check(right_rook, moveR):
                                         # append new move to king
                                         piece.add_move(moveK)
                                 else:
-                                    # append new move to rook
-                                    right_rook.add_move(moveR)
                                     # append new move to king
                                     piece.add_move(moveK)
 

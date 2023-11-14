@@ -13,9 +13,7 @@ made with python
 
 - Fix bug
     - cant detect check while castling
-    - AI cant detect check option
-    - sometimes cant capture opponent piece
-
+    
 - Features
     - some VFX for pawn promotion
     - winner result screen

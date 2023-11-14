@@ -7,4 +7,5 @@ class Move:
         self.final = final
 
     def __eq__(self, other):
+        if other == None: return False
         return self.initial == other.initial and self.final == other.final

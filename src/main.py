@@ -34,9 +34,14 @@ class Main:
 
             if dragger.dragging:
                 dragger.update_blit(screen)
-                
-            if game.next_player == 'black' and t > 2:
+            
+            if t == 2:
+                # check checkmates or draw
+                pass
+
+            if game.next_player == 'black' and t > 5:
                 p, move = AI.get_best_move(board, 'black')
+                game.play_sound(board.squares[move.final.row][move.final.col].has_piece())
                 board.move(p, move)
                 game.next_turn()
 
