@@ -443,13 +443,6 @@ class Board:
         elif isinstance(piece, King):
             king_moves()
 
-        # debug code
-        # if bool==True:
-        #     print(f'{piece.color} {piece.name} at {row}, {col} can move to:', end="\n| ")
-        #     for move in piece.moves:
-        #         print(f'{move.final.row}, {move.final.col}', end=" | ")
-        #     print('')
-
     def _create(self):
         for row in range(ROWS):
             for col in range(COLS):
