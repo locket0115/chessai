@@ -7,7 +7,6 @@ import copy
 import numpy
 
 class Heuristics:
-
     # The tables denote the points scored for the position of the chess pieces on the board.
 
     PAWN_TABLE = numpy.array([
@@ -51,7 +50,7 @@ class Heuristics:
         [-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
         [-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
         [-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
-        [ 0.0,   0.0, 0.0,  0.5,  0.5,  0.0,  0.0,  0.0]
+        [ 0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0]
     ])
 
     QUEEN_TABLE = numpy.array([

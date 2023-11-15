@@ -36,8 +36,18 @@ class Main:
                 dragger.update_blit(screen)
             
             if t == 2:
-                # check checkmates or draw
-                pass
+                if board.get_possible_moves('white', True) == []:
+                    if board.in_check(King('white'), None):
+                        print('Black Wins by Checkmate!')
+                    else:
+                        print('Stalemate')
+                    game.next_player = None
+                elif board.get_possible_moves('black', True) == []:
+                    if board.in_check(King('black'), None):
+                        print('White Wins by Checkmate!')
+                    else:
+                        print('Stalemate')
+                    game.next_player = None
 
             if game.next_player == 'black' and t > 5:
                 p, move = AI.get_best_move(board, 'black')
