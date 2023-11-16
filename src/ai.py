@@ -126,7 +126,8 @@ class AI:
                     best_move = move
                     best_piece = piece
 
-        print(f"best score {best_score} with moving {best_piece.color} {best_piece.name} at {best_move.initial.row},{best_move.initial.col} to {best_move.final.row},{best_move.final.col}")
+        if best_move != None:
+            print(f"best score {best_score} with moving {best_piece.color} {best_piece.name} at {best_move.initial.row},{best_move.initial.col} to {best_move.final.row},{best_move.final.col}")
         return best_piece, best_move
 
     @staticmethod

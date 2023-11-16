@@ -351,6 +351,14 @@ class Board:
                             if self.squares[row][c].has_piece():
                                 break
 
+                            # king 
+                            initial = Square(row, col)
+                            final = Square(row, 2)
+                            moveK = Move(initial, final)
+
+                            if not bool and self.in_check(piece, moveK):
+                                break
+
                             if c == 3:
                                 # adds left rook to king
                                 piece.left_rook = left_rook
@@ -360,14 +368,9 @@ class Board:
                                 final = Square(row, 3)
                                 moveR = Move(initial, final)
 
-                                # king 
-                                initial = Square(row, col)
-                                final = Square(row, 2)
-                                moveK = Move(initial, final)
-
                                 # check potencial checks
                                 if bool:
-                                    if not self.in_check(piece, moveK) and not self.in_check(left_rook, moveR):
+                                    if not self.in_check(left_rook, moveR):
                                         # append new move to king
                                         piece.add_move(moveK)
                                 else:
@@ -383,6 +386,14 @@ class Board:
                             if self.squares[row][c].has_piece():
                                 break
 
+                            # king 
+                            initial = Square(row, col)
+                            final = Square(row, 6)
+                            moveK = Move(initial, final)
+
+                            if not bool and self.in_check(piece, moveK):
+                                break
+
                             if c == 6:
                                 # adds right rook to king
                                 piece.right_rook = right_rook
@@ -392,14 +403,9 @@ class Board:
                                 final = Square(row, 5)
                                 moveR = Move(initial, final)
 
-                                # king 
-                                initial = Square(row, col)
-                                final = Square(row, 6)
-                                moveK = Move(initial, final)
-
                                 # check potencial checks
                                 if bool:
-                                    if not self.in_check(piece, moveK) and not self.in_check(right_rook, moveR):
+                                    if not self.in_check(right_rook, moveR):
                                         # append new move to king
                                         piece.add_move(moveK)
                                 else:
