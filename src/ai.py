@@ -1,163 +1,256 @@
+import copy, math, random
+
 from const import *
-from board import Board
-from square import Square
 from piece import *
-from move import Move
-import copy
-import numpy
+from book import Book
 
-class Heuristics:
-    # The tables denote the points scored for the position of the chess pieces on the board.
+class AI:
 
-    PAWN_TABLE = numpy.array([
-        [ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0],
-        [ 5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0],
-        [ 1.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  1.0],
-        [ 0.5,  0.5,  1.0,  2.5,  2.5,  1.0,  0.5,  0.5],
-        [ 0.0,  0.0,  0.0,  2.0,  2.0,  0.0,  0.0,  0.0],
-        [ 0.5, -0.5, -1.0,  0.0,  0.0, -1.0, -0.5,  0.5],
-        [ 0.5,  1.0, 1.0,  -2.0, -2.0,  1.0,  1.0,  0.5],
-        [ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0]
-    ])
+    def __init__(self, engine='book', depth=3):
+        self.engine = engine
+        self.depth = depth
+        self.book = Book()
+        self.color = 'black'
+        self.game_moves = []
+        self.explored = 0
 
-    KNIGHT_TABLE = numpy.array([
-        [-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0],
-        [-4.0, -2.0,  0.0,  0.0,  0.0,  0.0, -2.0, -4.0],
-        [-3.0,  0.0,  1.0,  1.5,  1.5,  1.0,  0.0, -3.0],
-        [-3.0,  0.5,  1.5,  2.0,  2.0,  1.5,  0.5, -3.0],
-        [-3.0,  0.0,  1.5,  2.0,  2.0,  1.5,  0.0, -3.0],
-        [-3.0,  0.5,  1.0,  1.5,  1.5,  1.0,  0.5, -3.0],
-        [-4.0, -2.0,  0.0,  0.5,  0.5,  0.0, -2.0, -4.0],
-        [-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0]
-    ])
+    # ----
+    # BOOK
+    # ----
 
-    BISHOP_TABLE = numpy.array([
-        [-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0],
-        [-1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0],
-        [-1.0,  0.0,  0.5,  1.0,  1.0,  0.5,  0.0, -1.0],
-        [-1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5, -1.0],
-        [-1.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -1.0],
-        [-1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0],
-        [-1.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.5, -1.0],
-        [-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0]
-    ])
+    def book_move(self):
+        move = self.book.next_move(self.game_moves, weighted=True)
+        return move
 
-    ROOK_TABLE = numpy.array([
-        [ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0],
-        [ 0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5],
-        [-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
-        [-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
-        [-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
-        [-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
-        [-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
-        [ 0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0]
-    ])
+    # -------
+    # MINIMAX
+    # -------
 
-    QUEEN_TABLE = numpy.array([
-        [-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0],
-        [-1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0],
-        [-1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0],
-        [-0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5],
-        [ 0.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5],
-        [-1.0,  0.5,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0],
-        [-1.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0, -1.0],
-        [-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0]
-    ])
+    def heatmap(self, piece, row, col):
+        hmp = 0
+        if piece.name == 'pawn':
+            if piece.color == 'black':
+                hmp = [ 
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.02, 0.01, 0.00, 0.00, 0.00, 0.00, 0.01, 0.02],
+                    [0.01, 0.01, 0.03, 0.06, 0.06, 0.03, 0.01, 0.01],
+                    [0.02, 0.02, 0.04, 0.07, 0.07, 0.04, 0.02, 0.02],
+                    [0.03, 0.03, 0.05, 0.08, 0.08, 0.05, 0.03, 0.03],
+                    [0.07, 0.07, 0.08, 0.09, 0.09, 0.08, 0.07, 0.07],
+                    [0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10],
+                    [9.00, 9.00, 9.00, 9.00, 9.00, 9.00, 9.00, 9.00],
+            ]
+            elif piece.color == 'white':
+                hmp = [ 
+                    [9.00, 9.00, 9.00, 9.00, 9.00, 9.00, 9.00, 9.00],
+                    [0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10],
+                    [0.07, 0.07, 0.08, 0.09, 0.09, 0.08, 0.07, 0.07],
+                    [0.03, 0.03, 0.05, 0.08, 0.08, 0.05, 0.03, 0.03],
+                    [0.02, 0.02, 0.04, 0.07, 0.07, 0.04, 0.02, 0.02],
+                    [0.01, 0.01, 0.03, 0.06, 0.06, 0.03, 0.01, 0.01],
+                    [0.02, 0.01, 0.00, 0.00, 0.00, 0.00, 0.01, 0.02],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+            ]
 
-    KING_TABLE = numpy.array([
-        [-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
-        [-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
-        [-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
-        [-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
-        [-2.0, -3.0, -3.0, -4.0, -4.0, -3.0, -3.0, -2.0],
-        [-1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0],
-        [ 2.0,  2.0,  0.0,  0.0,  0.0,  0.0,  2.0,  2.0],
-        [ 2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0]
-    ])
+        elif piece.name == 'knight':
+            hmp = [ 
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.00],
+                    [0.00, 0.02, 0.06, 0.05, 0.05, 0.06, 0.02, 0.00],
+                    [0.00, 0.03, 0.05, 0.10, 0.10, 0.05, 0.03, 0.00],
+                    [0.00, 0.03, 0.05, 0.10, 0.10, 0.05, 0.03, 0.00],
+                    [0.00, 0.02, 0.06, 0.05, 0.05, 0.06, 0.02, 0.00],
+                    [0.00, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+            ]
 
-    def get_value(piece, row, col):
-        sign = 1 if piece.color == 'white' else -1
-        Row = row if piece.color == 'white' else ROWS-1-row
+        elif piece.name == 'bishop':
+            hmp = [ 
+                    [0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.02],
+                    [0.01, 0.05, 0.03, 0.03, 0.03, 0.03, 0.05, 0.01],
+                    [0.01, 0.03, 0.07, 0.05, 0.05, 0.07, 0.03, 0.01],
+                    [0.01, 0.03, 0.05, 0.10, 0.10, 0.05, 0.03, 0.01],
+                    [0.01, 0.03, 0.05, 0.10, 0.10, 0.05, 0.03, 0.01],
+                    [0.01, 0.03, 0.07, 0.05, 0.05, 0.07, 0.03, 0.01],
+                    [0.01, 0.05, 0.03, 0.03, 0.03, 0.03, 0.05, 0.01],
+                    [0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.02],
+            ]
+        
+        elif piece.name == 'king':
+            if piece.color == 'black':
+                hmp = [ 
+                    [0.05, 0.50, 0.10, 0.00, 0.00, 0.00, 0.10, 0.05],
+                    [0.02, 0.02, 0.00, 0.00, 0.00, 0.00, 0.02, 0.02],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                ]
+            
+            elif piece.color == 'white':
+                hmp = [ 
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.02, 0.02, 0.00, 0.00, 0.00, 0.00, 0.02, 0.02],
+                    [0.05, 0.50, 0.10, 0.00, 0.00, 0.00, 0.10, 0.05],
+                ]
 
-        if isinstance(piece, Pawn):
-            return piece.value + Heuristics.PAWN_TABLE[Row][col] * sign
-        if isinstance(piece, Knight):
-            return piece.value + Heuristics.KNIGHT_TABLE[Row][col] * sign
-        if isinstance(piece, Bishop):
-            return piece.value + Heuristics.BISHOP_TABLE[Row][col] * sign
-        if isinstance(piece, Rook):
-            return piece.value + Heuristics.ROOK_TABLE[Row][col] * sign
-        if isinstance(piece, Queen):
-            return piece.value + Heuristics.QUEEN_TABLE[Row][col] * sign
-        if isinstance(piece, King):
-            return piece.value + Heuristics.KING_TABLE[Row][col] * sign
+        else :
+            hmp = [ 
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+            ]
 
+        eval = -hmp[row][col] if piece.color == 'black' else hmp[row][col]
+        return eval
 
-    @staticmethod
-    def evaluate(board):
-        total = 0
+    def threats(self, board, piece):
+        eval = 0
+        for move in piece.moves:
+            attacked = board.squares[move.final.row][move.final.col]
+            if attacked.has_piece():
+                if attacked.piece.color != piece.color:
+                    # checks
+                    if attacked.piece.name == 'king':
+                        eval += attacked.piece.value / 10500
+                    
+                    # threat
+                    else:
+                        eval += attacked.piece.value / 45
+
+        return eval
+
+    def static_eval(self, board):
+        # var
+        eval = 0
 
         for row in range(ROWS):
             for col in range(COLS):
                 if board.squares[row][col].has_piece():
-                    total += Heuristics.get_value(board.squares[row][col].piece, row, col)
+                    # piece
+                    piece =  board.squares[row][col].piece
+                    # white - black
+                    eval += piece.value
+                    # heatmap
+                    eval += self.heatmap(piece, row, col)
+                    # moves
+                    if piece.name != 'queen': eval += 0.01 * len(piece.moves)
+                    else: eval += 0.003 * len(piece.moves)
+                    # checks
+                    eval += self.threats(board, piece)
         
-        return total
+        eval = round(eval, 5)
+        return eval
 
-class AI:
-    @staticmethod
-    def get_best_move(board, color):
-        best_move = None
-        best_piece = None
-        best_score = INFINITE
-
-        for moves in board.get_possible_moves(color, bool=False):
-            piece, move = moves
-            temp_board = copy.deepcopy(board)
-            temp_piece = copy.deepcopy(piece)
-
-            temp_board.move(temp_piece, move)
-
-            score = AI.alphabeta(temp_board, 2, -INFINITE, INFINITE, True)
+    def get_moves(self, board, color):
+        moves = []
+        for row in range(ROWS):
+            for col in range(COLS):
+                square = board.squares[row][col]
+                if square.has_team_piece(color):
+                    board.calc_moves(square.piece, square.row, square.col)
+                    moves += square.piece.moves
         
-            if score < best_score:
-                if not temp_board.in_check(temp_piece, move=None):
-                    best_score = score
-                    best_move = move
-                    best_piece = piece
+        return moves
 
-        if best_move != None:
-            print(f"best score {best_score} with moving {best_piece.color} {best_piece.name} at {best_move.initial.row},{best_move.initial.col} to {best_move.final.row},{best_move.final.col}")
-        return best_piece, best_move
-
-    @staticmethod
-    def alphabeta(board, depth, a, b, maximizing):
+    def minimax(self, board, depth, maximizing, alpha, beta):
         if depth == 0:
-            return Heuristics.evaluate(board)
+            return self.static_eval(board), None # eval, move
         
+        # white
         if maximizing:
-            best_score = -INFINITE
-
-            for moves in board.get_possible_moves('white', bool=False):
-                piece, move = moves
+            max_eval = -math.inf
+            moves = self.get_moves(board, 'white')
+            for move in moves:
+                self.explored += 1
+                piece = board.squares[move.initial.row][move.initial.col].piece
                 temp_board = copy.deepcopy(board)
                 temp_board.move(piece, move)
+                piece.moved = False
+                eval = self.minimax(temp_board, depth-1, False, alpha, beta)[0] # eval, mov
+                if eval > max_eval:
+                    max_eval = eval
+                    best_move = move
 
-                best_score = max(best_score, AI.alphabeta(temp_board, depth-1, a, b, False))
-                a = max(a, best_score)
-                if b <= a:
-                    break
-            return best_score
-        else:
-            best_score = INFINITE
+                alpha = max(alpha, max_eval)
+                if beta <= alpha: break
+
+            if not best_move:
+                best_move = moves[0]
+
+            return max_eval, best_move # eval, move
+        
+        # black
+        elif not maximizing:
+            min_eval = math.inf
+            moves = self.get_moves(board, 'black')
+            for move in moves:
+                self.explored += 1
+                piece = board.squares[move.initial.row][move.initial.col].piece
+                temp_board = copy.deepcopy(board)
+                temp_board.move(piece, move)
+                piece.moved = False
+                eval = self.minimax(temp_board, depth-1, True, alpha, beta)[0] # eval, move
+                if eval < min_eval:
+                    min_eval = eval
+                    best_move = move
+
+                beta = min(beta, min_eval)
+                if beta <= alpha: break
             
-            for moves in board.get_possible_moves('black', bool=False):
-                piece, move = moves
-                temp_board = copy.deepcopy(board)
-                temp_board.move(piece, move)
+            if not best_move:
+                idx = random.randrange(0, len(moves))
+                best_move = moves[idx]
 
-                best_score = min(best_score, AI.alphabeta(temp_board, depth-1, a, b, True))
-                b = min(b, best_score)
-                if b <= a:
-                    break
-            return best_score
+            return min_eval, best_move # eval, move
+
+    # ---------
+    # MAIN EVAL
+    # ---------
+
+    def eval(self, main_board):
+        self.explored = 0
+
+        # add last move
+        last_move = main_board.last_move
+        self.game_moves.append(last_move)
+
+        # book engine
+        if self.engine == 'book':
+            move = self.book_move()
+
+            # no more book moves ?
+            if move is None:
+                self.engine = 'minimax'
+
+        # minimax engine
+        if self.engine == 'minimax':
+            # printing
+            print('\nFinding best move...')
+                        
+            # minimax initial call
+            eval, move = self.minimax(main_board, self.depth, False, -math.inf, math.inf) # eval, move
+            
+            # printing
+            print('\n- Initial eval:',self.static_eval(main_board))
+            print('- Final eval:', eval)
+            print('- Boards explored', self.explored)
+            if eval >= 5000: print('* White MATE!')
+            if eval <= -5000: print('* Black MATE!')
+            
+        # append
+        self.game_moves.append(move)
+        
+        return move

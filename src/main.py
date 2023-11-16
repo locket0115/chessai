@@ -1,12 +1,9 @@
-import pygame
-import sys
+import sys, pygame
 
 from const import *
 from game import Game
-from square import Square
 from move import Move
-from piece import *
-from ai import AI
+from square import Square
 
 class Main:
 
@@ -17,148 +14,152 @@ class Main:
         self.game = Game()
 
     def mainloop(self):
-        
+
         screen = self.screen
         game = self.game
         board = self.game.board
+        ai = self.game.ai
         dragger = self.game.dragger
-        t = 0
 
         while True:
-            # show methods
-            game.show_bg(screen)
-            game.show_last_move(screen)
-            game.show_moves(screen)
-            game.show_pieces(screen)
-            # game.show_hover(screen)
+            
+            if not game.selected_piece:
+                game.show_bg(screen)
+                game.show_pieces(screen)
+
+            game.show_hover(screen)
 
             if dragger.dragging:
                 dragger.update_blit(screen)
-            
-            if t == 2:
-                if board.get_possible_moves('white', True) == []:
-                    if board.in_check(King('white'), None):
-                        print('Black Wins by Checkmate!')
-                    else:
-                        print('Stalemate')
-                    game.next_player = None
-                elif board.get_possible_moves('black', True) == []:
-                    if board.in_check(King('black'), None):
-                        print('White Wins by Checkmate!')
-                    else:
-                        print('Stalemate')
-                    game.next_player = None
-
-            if game.next_player == 'black' and t > 5:
-                p, move = AI.get_best_move(board, 'black')
-                game.play_sound(board.squares[move.final.row][move.final.col].has_piece())
-                board.move(p, move)
-                game.next_turn()
 
             for event in pygame.event.get():
-
-                # click
+                
+                # mouse click
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     dragger.update_mouse(event.pos)
 
+                    pos = event.pos
                     clicked_row = dragger.mouseY // SQSIZE
                     clicked_col = dragger.mouseX // SQSIZE
 
-                    if Square.in_range(clicked_row, clicked_col):
-                        # if clicked square has a piece ?
-                        if board.squares[clicked_row][clicked_col].has_piece():
-                            piece = board.squares[clicked_row][clicked_col].piece
-                            # vaild piece (color) ?
-                            if piece.color == game.next_player and game.next_player == 'white':
-                                board.calc_moves(piece, clicked_row, clicked_col, bool=True)
-                                dragger.save_initial(event.pos)
-                                dragger.drag_piece(piece)
-                                # show methods
-                                game.show_bg(screen)
-                                game.show_last_move(screen)
-                                game.show_moves(screen)
-                                game.show_pieces(screen)
-
-                # mouse motion
-                elif event.type == pygame.MOUSEMOTION:
-                    motion_row = event.pos[1] // SQSIZE
-                    motion_col = event.pos[0] // SQSIZE
-                    
-
-                    if Square.in_range(motion_row, motion_col):
-                        game.set_hover(motion_row, motion_col)
-
-                        if dragger.dragging:
-                            dragger.update_mouse(event.pos)
-                            # show methods
+                    if board.squares[clicked_row][clicked_col].has_piece():
+                        piece = board.squares[clicked_row][clicked_col].piece
+                        # valid piece ?
+                        if piece.color == game.next_player:
+                            game.select_piece(piece)
+                            board.calc_moves(piece, clicked_row, clicked_col)
+                            dragger.drag_piece(piece)
+                            dragger.save_initial(pos)
+                            # show
                             game.show_bg(screen)
-                            game.show_last_move(screen)
-                            game.show_moves(screen)
                             game.show_pieces(screen)
-                            # game.show_hover(screen)
-                            dragger.update_blit(screen)
 
-                #click release
+                # mouse release
                 elif event.type == pygame.MOUSEBUTTONUP:
-                                        
                     if dragger.dragging:
                         dragger.update_mouse(event.pos)
 
+                        # released pos
                         released_row = dragger.mouseY // SQSIZE
                         released_col = dragger.mouseX // SQSIZE
 
-                        if Square.in_range(released_row, released_col):
-                            # create possible move
-                            initial = Square(dragger.initial_row, dragger.initial_col)
-                            final = Square(released_row, released_col)
-                            move = Move(initial, final)
+                        # new move object
+                        initial = Square(dragger.initial_row, dragger.initial_col)
+                        final = Square(released_row, released_col)
+                        move = Move(initial, final)
+                        
+                        # valid move -> move ?
+                        if board.valid_move(dragger.piece, move):
+                            # capture
+                            captured = board.squares[released_row][released_col].has_piece()
+                            # move
+                            board.move(dragger.piece, move)
+                            game.sound_effect(captured)
+                            # draw
+                            game.show_bg(screen)
+                            game.show_pieces(screen)
+                            # next -> AI
+                            game.next_turn()
+                            
+                            # --------------
+                            # >>>>> AI >>>>>
+                            # --------------
 
-                            # vaild move ?
-                            if board.vaild_move(dragger.piece, move):
-                                # normal capture
-                                captured = board.squares[released_row][released_col].has_piece()
-                                en_passanted = isinstance(dragger.piece, Pawn) and (initial.col != released_col)
-                                board.move(dragger.piece, move)
-
-                                board.set_true_en_passant(dragger.piece)
-
-                                # sounds
-                                game.play_sound(captured or en_passanted)
-                                # show methods
-                                game.show_bg(screen)
-                                game.show_last_move(screen)
+                            if game.gamemode == 'ai':
+                                # update
+                                game.unselect_piece()
                                 game.show_pieces(screen)
-                                # next turn
+                                pygame.display.update()
+                                # optimal move
+                                move = ai.eval(board)
+                                initial = move.initial
+                                final = move.final
+                                # piece
+                                piece = board.squares[initial.row][initial.col].piece
+                                # capture
+                                captured = board.squares[final.row][final.col].has_piece()
+                                # move
+                                board.move(piece, move)
+                                game.sound_effect(captured)
+                                # draw
+                                game.show_bg(screen)
+                                game.show_pieces(screen)
+                                # next -> AI
                                 game.next_turn()
-
-                        # clear moves
-                        dragger.piece.clear_moves()
-                        t = 0
-
+                    
+                    game.unselect_piece()
                     dragger.undrag_piece()
+
+                # mouse motion
+                elif event.type == pygame.MOUSEMOTION:
+                    pos = event.pos
+                    motion_row = pos[1] // SQSIZE
+                    motion_col = pos[0] // SQSIZE
+
+                    game.set_hover(motion_row, motion_col)
+
+                    if dragger.dragging:
+                        dragger.update_mouse(event.pos)
+                        # show
+                        game.show_bg(screen)
+                        game.show_pieces(screen)
+                        game.show_hover(screen)
+                        dragger.update_blit(screen)
 
                 # key press
                 elif event.type == pygame.KEYDOWN:
+                    
+                    # gamemode
+                    if event.key == pygame.K_a:
+                        game.change_gamemode()
+                    
+                    # depth
+                    if event.key == pygame.K_3:
+                        ai.depth = 3
 
-                    # changing theme
+                    if event.key == pygame.K_4:
+                        ai.depth = 4
+
+                    # theme
                     if event.key == pygame.K_t:
                         game.change_theme()
-
-                    # reset game
+                    
+                    # reset
                     if event.key == pygame.K_r:
                         game.reset()
+
+                        screen = self.screen
                         game = self.game
                         board = self.game.board
+                        ai = self.game.ai
                         dragger = self.game.dragger
 
-                #quit application
-                if event.type == pygame.QUIT:
+                elif event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
 
-            t = t+1
             pygame.display.update()
-
-
-main = Main()
-main.mainloop()
+    
+if __name__ == '__main__':
+    m = Main()
+    m.mainloop()
