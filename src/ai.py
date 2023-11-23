@@ -118,7 +118,7 @@ class AI:
 
             temp_board.move(temp_piece, move)
 
-            score = AI.alphabeta(temp_board, 2, -INFINITE, INFINITE, True)
+            score = AI.alphabeta(temp_board, 1, -INFINITE, best_score, True)
         
             if score < best_score:
                 if not temp_board.in_check(temp_piece, move=None):

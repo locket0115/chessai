@@ -115,9 +115,7 @@ class Board:
                     temp_board.calc_moves(p, row, col, bool=False)
                     for m in p.moves:
                         if isinstance(m.final.piece, King) and m.final.piece.color == piece.color:
-                            p.clear_moves()
                             return True
-                    p.clear_moves()
         
         return False
 
@@ -353,10 +351,10 @@ class Board:
 
                             # king 
                             initial = Square(row, col)
-                            final = Square(row, 2)
+                            final = Square(row, c)
                             moveK = Move(initial, final)
 
-                            if not bool and self.in_check(piece, moveK):
+                            if bool and self.in_check(piece, moveK):
                                 break
 
                             if c == 3:
@@ -388,10 +386,10 @@ class Board:
 
                             # king 
                             initial = Square(row, col)
-                            final = Square(row, 6)
+                            final = Square(row, c)
                             moveK = Move(initial, final)
 
-                            if not bool and self.in_check(piece, moveK):
+                            if bool and self.in_check(piece, moveK):
                                 break
 
                             if c == 6:

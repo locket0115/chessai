@@ -130,10 +130,10 @@ class Main:
                                 game.show_pieces(screen)
                                 # next turn
                                 game.next_turn()
+                                t = 0
 
                         # clear moves
                         dragger.piece.clear_moves()
-                        t = 0
 
                     dragger.undrag_piece()
 
