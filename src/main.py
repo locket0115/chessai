@@ -51,7 +51,6 @@ class Main:
 
             if game.next_player == 'black' and t > 5:
                 p, move = AI.get_best_move(board, 'black')
-                game.play_sound(board.squares[move.final.row][move.final.col].has_piece())
                 board.move(p, move)
                 game.next_turn()
 
@@ -122,8 +121,6 @@ class Main:
 
                                 board.set_true_en_passant(dragger.piece)
 
-                                # sounds
-                                game.play_sound(captured or en_passanted)
                                 # show methods
                                 game.show_bg(screen)
                                 game.show_last_move(screen)
