@@ -1,7 +1,5 @@
 # Chess Game
-made with python
-visualized with pygame
-implemented with [alpha-beta pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
+visualized with [pygame](https://www.pygame.org/docs/) / implemented with [alpha-beta pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
 
 ## Instructions
 - Drag and drop mouse to control pieces
