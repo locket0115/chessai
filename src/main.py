@@ -30,29 +30,37 @@ class Main:
             game.show_last_move(screen)
             game.show_moves(screen)
             game.show_pieces(screen)
-            # game.show_hover(screen)
-
+            game.show_winner(screen)
             if dragger.dragging:
                 dragger.update_blit(screen)
             
             if t == 2:
+
                 if board.get_possible_moves('white', True) == []:
                     if board.in_check(King('white'), None):
+                        game.set_winner('black')
                         print('Black Wins by Checkmate!')
                     else:
+                        game.set_winner('draw')
                         print('Stalemate')
                     game.next_player = None
                 elif board.get_possible_moves('black', True) == []:
                     if board.in_check(King('black'), None):
                         print('White Wins by Checkmate!')
+                        game.set_winner('white')
                     else:
                         print('Stalemate')
+                        game.set_winner('draw')
                     game.next_player = None
 
             if game.next_player == 'black' and t > 5:
-                p, move = AI.get_best_move(board, 'black')
+                p, move = AI.get_best_move(board, 'black', depth= 2 if game.board.piece_amount('black') < 4 or game.board.piece_amount('white') < 6 else 1)
+                
                 board.move(p, move)
+                board.set_true_en_passant(p)
+                
                 game.next_turn()
+                t = 0
 
             for event in pygame.event.get():
 
@@ -115,8 +123,6 @@ class Main:
                             # vaild move ?
                             if board.vaild_move(dragger.piece, move):
                                 # normal capture
-                                captured = board.squares[released_row][released_col].has_piece()
-                                en_passanted = isinstance(dragger.piece, Pawn) and (initial.col != released_col)
                                 board.move(dragger.piece, move)
 
                                 board.set_true_en_passant(dragger.piece)

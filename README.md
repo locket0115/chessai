@@ -1,22 +1,30 @@
 # Chess Game
 made with python
+visualized with pygame
+implemented with [alpha-beta pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
 
 ## Instructions
-- Entry point: main.py
-- Drag mouse to controll pieces
-- Press 't' to change theme
-- Press 'r' to reset game
+- Drag and drop mouse to control pieces
+- Press **'R'** to reset game
+- Press **'T'** to change theme
+
+## Download and Run chess
+
+download project
+```
+git clone https://github.com/locket0115/chessai.git
+cd chessai
+pip install -r requirements.txt
+```
+
+run the program
+```
+python -u main.py
+```
 
 -----------------
 
 ### TODO:
 
-- Fix bug
-    - cant detect check while castling
-    
-- Features
-    - some VFX for pawn promotion
-    - winner result screen
-
-- Other
-    - optimize AI performence
+- pawn promotion selection
+- use MCTS with NN to improve performence

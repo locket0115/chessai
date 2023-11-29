@@ -1,4 +1,5 @@
 import pygame
+import os
 
 from const import *
 from board import Board
@@ -10,6 +11,7 @@ class Game:
 
     def __init__(self):
         self.next_player = 'white'
+        self.winner = None
         self.hovered_sqr = None
         self.board = Board()
         self.dragger = Dragger()
@@ -102,6 +104,20 @@ class Game:
             # blit
             pygame.draw.rect(surface, color, rect, width=3)
 
+    def show_winner(self, surface):
+        if self.winner != None:
+            if self.winner == 'white':
+                win = 'win'
+            elif self.winner == 'black':
+                win = 'lost'
+            elif self.winner == 'draw':
+                win = 'draw'
+            
+            img = pygame.image.load(os.path.join(f'assets/images/result/{win}.png'))
+            img_center = HEIGHT // 2, WIDTH // 2
+            rect = img.get_rect(center = img_center)
+            surface.blit(img, rect)
+
     # other methods
 
     def next_turn(self):
@@ -112,6 +128,9 @@ class Game:
 
     def change_theme(self):
         self.config.change_theme()
+
+    def set_winner(self, winner):
+        self.winner = winner
 
     def reset(self):
         idx = self.config.idx

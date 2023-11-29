@@ -106,7 +106,7 @@ class Heuristics:
 
 class AI:
     @staticmethod
-    def get_best_move(board, color):
+    def get_best_move(board, color, depth=1):
         best_move = None
         best_piece = None
         best_score = INFINITE
@@ -118,7 +118,7 @@ class AI:
 
             temp_board.move(temp_piece, move)
 
-            score = AI.alphabeta(temp_board, 1, -INFINITE, best_score, True)
+            score = AI.alphabeta(temp_board, depth, -INFINITE, best_score, True)
         
             if score < best_score:
                 if not temp_board.in_check(temp_piece, move=None):

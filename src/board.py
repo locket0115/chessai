@@ -87,6 +87,16 @@ class Board:
 
         piece.en_passant = True
 
+    def piece_amount(self, color):
+        result = 0
+
+        for row in range(ROWS):
+            for col in range(COLS):
+                if self.squares[row][col].has_team_piece(color):
+                    result = result + 1
+        
+        return result
+
     def get_possible_moves(self, color, bool = False):
         moves = []
 
@@ -109,7 +119,7 @@ class Board:
 
         for row in range(ROWS):
             for col in range(COLS):
-                if self.squares[row][col].has_enemy_piece(piece.color):
+                if temp_board.squares[row][col].has_enemy_piece(piece.color):
                     p = temp_board.squares[row][col].piece
                     temp_board.calc_moves(p, row, col, bool=False)
                     for m in p.moves:
