@@ -348,7 +348,7 @@ class Board:
                             piece.add_move(move)
 
             # castling moves
-            if not piece.moved:
+            if not piece.moved and not self.in_check(piece):
                 # queen castling
                 left_rook = self.squares[row][0].piece
                 if isinstance(left_rook, Rook):
