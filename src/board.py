@@ -111,7 +111,7 @@ class Board:
 
         return moves
 
-    def in_check(self, piece, move):
+    def in_check(self, piece, move=None):
         temp_board = copy.deepcopy(self)
         if move != None:
             temp_piece = copy.deepcopy(piece)
@@ -348,7 +348,7 @@ class Board:
                             piece.add_move(move)
 
             # castling moves
-            if not piece.moved and not self.in_check(piece):
+            if not piece.moved and not (bool and self.in_check(piece)):
                 # queen castling
                 left_rook = self.squares[row][0].piece
                 if isinstance(left_rook, Rook):

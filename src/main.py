@@ -54,7 +54,7 @@ class Main:
                     game.next_player = None
 
             if game.next_player == 'black' and t > 5:
-                p, move = AI.get_best_move(board, 'black', depth= 2 if game.board.piece_amount('black') < 4 or game.board.piece_amount('white') < 6 else 1)
+                p, move = AI.get_best_move(board, 'black', depth= 2 if game.board.piece_amount('black') + game.board.piece_amount('white') < 12 else 1)
                 
                 board.move(p, move)
                 board.set_true_en_passant(p)

@@ -147,6 +147,10 @@ class AI:
                 a = max(a, best_score)
                 if b <= a:
                     break
+
+            if best_score == -INFINITE:
+                return INFINITE
+            
             return best_score
         else:
             best_score = INFINITE
@@ -160,4 +164,8 @@ class AI:
                 b = min(b, best_score)
                 if b <= a:
                     break
+
+            if best_score == INFINITE:
+                return -INFINITE
+
             return best_score
