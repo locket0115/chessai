@@ -17,7 +17,7 @@ pip install -r requirements.txt
 
 run the program
 ```
-python -u main.py
+python -u src\main.py
 ```
 
 -----------------
