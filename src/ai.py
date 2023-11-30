@@ -149,7 +149,10 @@ class AI:
                     break
 
             if best_score == -INFINITE:
-                return INFINITE
+                if board.in_check(King('white'), None):
+                    return -INFINITE
+                else:
+                    return INFINITE
             
             return best_score
         else:
@@ -166,6 +169,9 @@ class AI:
                     break
 
             if best_score == INFINITE:
-                return -INFINITE
+                if board.in_check(King('black'), None):
+                    return INFINITE
+                else:
+                    return -INFINITE
 
             return best_score
